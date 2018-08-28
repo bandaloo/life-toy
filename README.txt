@@ -9,3 +9,5 @@ and launch life.
 Press 'enter' to go into edit mode, where you can modify the grid by clicking.
 Press enter again to play. There is a buffer of different game states so you
 can roll back the simulation by pressing the back arrow.
+
+You can also cycle the color of the cells by pressing 'c'.

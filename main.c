@@ -5,6 +5,16 @@
 #include "rules.h"
 
 int cellcolor[] = {255, 110, 0};
+int colorlist[COLOR_AMOUNT][3] = {
+    {255, 110, 0}, 
+    {99, 223, 255}, 
+    {249, 234, 67}, 
+    {249, 67, 67}, 
+    {114, 247, 66}, 
+    {220, 98, 247}
+}; 
+
+struct state currstate;
 
 void render_field(SDL_Renderer *renderer, struct field *field, int r, int g, int b, int animtime, int prevtime) {
     SDL_Rect rect = {0, 0, CELL_WIDTH, CELL_HEIGHT};
@@ -39,8 +49,6 @@ void render_field(SDL_Renderer *renderer, struct field *field, int r, int g, int
     }
 }
 
-struct state currstate;
-
 void render_placement(SDL_Renderer *renderer, struct state *state) {
     SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
     if (state->paused) {
@@ -53,6 +61,7 @@ int main(int argc, char *argv[])
 {
     currstate.paused = 0;
     currstate.clicked = 0;
+    currstate.colorcounter = 0;
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         return EXIT_FAILURE;
     }
@@ -87,6 +96,10 @@ int main(int argc, char *argv[])
                 case SDLK_LEFT:
                     if (currstate.paused) currfield = currfield->prev;
                     break;
+                case SDLK_c:
+                   currstate.colorcounter++;
+                   currstate.colorcounter %= COLOR_AMOUNT;
+                   break;
                 default: break;
                 }
             } else if (e.type == SDL_MOUSEMOTION) {
@@ -115,7 +128,7 @@ int main(int argc, char *argv[])
             }
         }
         SDL_RenderClear(renderer);
-        render_field(renderer, currfield, cellcolor[0], cellcolor[1], cellcolor[2], animtime, prevtime);
+        render_field(renderer, currfield, colorlist[currstate.colorcounter][0], colorlist[currstate.colorcounter][1], colorlist[currstate.colorcounter][2], animtime, prevtime);
         render_placement(renderer, &currstate);
         //roundedBoxRGBA(renderer, 0, 0, 100, 100, 20, 0, 100, 0, 255);
         //aacircleRGBA (renderer, 200, 200, 100, 200, 0, 0, 255);
