@@ -15,6 +15,7 @@ int colorlist[COLOR_AMOUNT][3] = {
 }; 
 
 struct state currstate;
+int movemode = 1;
 
 void render_field(SDL_Renderer *renderer, struct field *field, int r, int g, int b, int animtime, int prevtime) {
     SDL_Rect rect = {0, 0, CELL_WIDTH, CELL_HEIGHT};
@@ -57,8 +58,13 @@ void render_placement(SDL_Renderer *renderer, struct state *state) {
     }
 }
 
-int main(int argc, char *argv[])
-{
+int clamp(int n, int l) {
+    if (n < 0) return 0;
+    if (n > l) return l;
+    return n;
+}
+
+int main(int argc, char *argv[]) {
     currstate.paused = 0;
     currstate.clicked = 0;
     currstate.colorcounter = 0;
@@ -97,13 +103,37 @@ int main(int argc, char *argv[])
                     if (currstate.paused) currfield = currfield->prev;
                     break;
                 case SDLK_c:
-                   currstate.colorcounter++;
-                   currstate.colorcounter %= COLOR_AMOUNT;
-                   break;
+                    currstate.colorcounter++;
+                    currstate.colorcounter %= COLOR_AMOUNT;
+                    break;
+                case SDLK_h:
+                    currstate.cellx--;
+                    currstate.cellx = clamp(currstate.cellx, FIELD_WIDTH - 1);
+                    movemode = 1;
+                    break;
+                case SDLK_j:
+                    currstate.celly++;
+                    currstate.celly = clamp(currstate.celly, FIELD_HEIGHT - 1);
+                    movemode = 1;
+                    break;
+                case SDLK_k:
+                    currstate.celly--;
+                    currstate.celly = clamp(currstate.celly, FIELD_HEIGHT - 1);
+                    movemode = 1;
+                    break;
+                case SDLK_l:
+                    currstate.cellx++;
+                    currstate.cellx = clamp(currstate.cellx, FIELD_WIDTH - 1);
+                    movemode = 1;
+                    break;
+                case SDLK_SPACE:
+                    if (currstate.paused) currstate.clicked = 1;
+                    break;
                 default: break;
                 }
             } else if (e.type == SDL_MOUSEMOTION) {
                 SDL_GetMouseState(&(currstate.clickx), &(currstate.clicky));
+                movemode = 0;
             } else if (e.type == SDL_MOUSEBUTTONDOWN && currstate.paused) {
                 //SDL_GetMouseState(&clickx, &clicky);
                 currstate.clicked = 1;
@@ -120,8 +150,11 @@ int main(int argc, char *argv[])
         }
         else {
             SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
-            currstate.cellx = currstate.clickx / CELL_WIDTH;
-            currstate.celly = currstate.clicky / CELL_HEIGHT;
+            if (movemode == 0) {
+                currstate.cellx = currstate.clickx / CELL_WIDTH;
+                currstate.celly = currstate.clicky / CELL_HEIGHT;
+            } else {
+            }
             if (currstate.clicked) {
                 currstate.clicked = 0;
                 currfield->board[currstate.cellx][currstate.celly] = !currfield->board[currstate.cellx][currstate.celly];

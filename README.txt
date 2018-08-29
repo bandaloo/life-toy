@@ -11,3 +11,5 @@ Press enter again to play. There is a buffer of different game states so you
 can roll back the simulation by pressing the back arrow.
 
 You can also cycle the color of the cells by pressing 'c'.
+
+In edit mode, there are also vim style controls and cells can be set with space.
